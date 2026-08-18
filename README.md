@@ -25,3 +25,6 @@ GitHub Pages-ready static website for ZYKA GOLD.
 
 ## Important
 The UPI payment button opens the user's UPI app. The website does not verify payment automatically. The customer confirms payment through WhatsApp and can send the screenshot there.
+
+## Product images
+The supplied ZYKA GOLD packaging images are included under `assets/` and displayed on the home/product/gallery sections.
