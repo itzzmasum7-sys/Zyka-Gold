@@ -2,93 +2,268 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZYKA GOLD | Pure & Premium Spices</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="ZYKA GOLD – Pure Taste. Premium Quality. Premium Indian spice powders for retail and wholesale orders.">
+  <meta name="keywords" content="ZYKA GOLD spices, turmeric powder, red chilli powder, coriander powder, cumin powder, Indian spices, wholesale spices">
+  <meta name="theme-color" content="#090909">
+  <meta property="og:title" content="ZYKA GOLD – Pure Taste. Premium Quality.">
+  <meta property="og:description" content="Premium spice products from ZYKA GOLD. Retail and wholesale enquiries available.">
+  <meta property="og:type" content="website">
+  <title>ZYKA GOLD | Pure Taste. Premium Quality.</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Header -->
   <header class="nav">
     <a class="logo" href="#home"><span>ZYKA</span> GOLD</a>
+    <button class="menu" aria-label="Open menu" onclick="toggleMenu()">☰</button>
     <nav id="navLinks">
-      <a href="#home">Home</a><a href="#products">Products</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a>
+      <a href="#home">Home</a>
+      <a href="#products">Products</a>
+      <a href="#story">About</a>
+      <a href="#quality">Quality</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#retailer">Retailer / Distributor</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
     </nav>
   </header>
 
   <main>
-    <!-- Hero Section -->
     <section id="home" class="hero">
       <div class="hero-copy">
         <p class="eyebrow">PREMIUM INDIAN SPICES</p>
-        <h1>Pure Taste.<br><em>Shuddh Masale, Swad Bemisaal!</em></h1>
-        <p>100% Pure, Natural & Hygienically Packed Spices.</p>
-        <a class="btn gold" href="#products">Explore Products</a>
+        <h1>Pure Taste.<br><em>Premium Quality.</em></h1>
+        <p>Thoughtfully presented spice essentials for the taste of India.</p>
+        <div class="actions">
+          <a class="btn gold" href="#products">Shop Products</a>
+          <a class="btn outline" href="https://wa.me/918102942195?text=Hello%20ZYKA%20GOLD%2C%20I%20want%20to%20make%20an%20enquiry." target="_blank" rel="noopener">Order on WhatsApp</a>
+        </div>
+      </div>
+      <div class="hero-pack">
+        <div class="pack">
+          <div class="pack-top">ZYKA</div>
+          <div class="pack-mid">GOLD</div>
+          <div class="pack-bottom">PREMIUM<br>SPICES</div>
+        </div>
       </div>
     </section>
 
-    <!-- Products Section (4 Products) -->
+    <section class="trust">
+      <div><b>01</b><span>Quality-focused sourcing</span></div>
+      <div><b>02</b><span>Hygienic packaging</span></div>
+      <div><b>03</b><span>Retail & wholesale</span></div>
+      <div><b>04</b><span>Made for Indian kitchens</span></div>
+    </section>
+
     <section id="products" class="section">
-      <div class="section-head"><h2>Our Premium Collection</h2></div>
+      <div class="section-head">
+        <p class="eyebrow">OUR COLLECTION</p>
+        <h2>Premium Everyday Spices</h2>
+        <p>Choose a product, pack size and order type. Prices are intentionally not displayed.</p>
+      </div>
       <div class="products">
         <article class="card">
-          <img src="turmeric.png" alt="Turmeric Powder">
+          <div class="product-art"><img src="turmeric.png" alt="ZYKA GOLD Turmeric Powder packaging"></div>
           <h3>Turmeric Powder</h3>
-          <p>Rich in Curcumin & Natural Gold Colour.</p>
-          <button class="btn gold full" onclick="openOrder('Turmeric Powder')">Order Now</button>
+          <p>Warm, earthy spice for everyday Indian cooking.</p>
+          <small>Ingredients: Turmeric powder</small>
+          <div class="packs">50g · 100g · 200g · 500g · 1kg</div>
+          <button class="btn gold full" onclick="openOrder('Turmeric Powder')">Order / Enquire</button>
         </article>
         <article class="card">
-          <img src="red-chilli.png" alt="Red Chilli Powder">
+          <div class="product-art"><img src="red-chilli.png" alt="ZYKA GOLD Red Chilli Powder packaging"></div>
           <h3>Red Chilli Powder</h3>
-          <p>Teekha bhi, Swad bhi - Har dish ki jaan.</p>
-          <button class="btn gold full" onclick="openOrder('Red Chilli Powder')">Order Now</button>
+          <p>Bold colour and balanced heat for Indian recipes.</p>
+          <small>Ingredients: Red chilli powder</small>
+          <div class="packs">50g · 100g · 200g · 500g · 1kg</div>
+          <button class="btn gold full" onclick="openOrder('Red Chilli Powder')">Order / Enquire</button>
         </article>
         <article class="card">
-          <img src="coriander.png" alt="Coriander Powder">
+          <div class="product-art"><img src="coriander.png" alt="ZYKA GOLD Coriander Powder packaging"></div>
           <h3>Coriander Powder</h3>
-          <p>Freshly ground for a rich, aromatic flavour.</p>
-          <button class="btn gold full" onclick="openOrder('Coriander Powder')">Order Now</button>
+          <p>Aromatic and versatile for curries, gravies and blends.</p>
+          <small>Ingredients: Coriander powder</small>
+          <div class="packs">50g · 100g · 200g · 500g · 1kg</div>
+          <button class="btn gold full" onclick="openOrder('Coriander Powder')">Order / Enquire</button>
         </article>
         <article class="card">
-          <img src="cumin.png" alt="Cumin Powder">
+          <div class="product-art"><img src="cumin.png" alt="ZYKA GOLD Cumin Powder packaging"></div>
           <h3>Cumin Powder</h3>
-          <p>Distinctive earthy aroma for everyday dishes.</p>
-          <button class="btn gold full" onclick="openOrder('Cumin Powder')">Order Now</button>
+          <p>Distinctive earthy aroma for everyday authentic dishes.</p>
+          <small>Ingredients: Cumin powder</small>
+          <div class="packs">50g · 100g · 200g · 500g · 1kg</div>
+          <button class="btn gold full" onclick="openOrder('Cumin Powder')">Order / Enquire</button>
         </article>
       </div>
     </section>
 
-    <!-- Feedback / Reviews Section -->
-    <section id="reviews" class="section dark-section">
-      <div class="section-head"><h2>Customer Reviews</h2></div>
+    <section class="section gallery">
+      <div class="section-head">
+        <p class="eyebrow">PACKAGING</p>
+        <h2>See the ZYKA GOLD collection.</h2>
+        <p>Premium packaging visuals for the current product range.</p>
+      </div>
+      <div class="gallery-grid">
+        <img src="red-chilli.png" alt="ZYKA GOLD Red Chilli Powder">
+        <img src="coriander.png" alt="ZYKA GOLD Coriander Powder">
+        <img src="turmeric.png" alt="ZYKA GOLD Turmeric Powder">
+        <img src="cumin.png" alt="ZYKA GOLD Cumin Powder">
+      </div>
+    </section>
+
+    <section id="reviews" class="section">
+      <div class="section-head">
+        <p class="eyebrow">TESTIMONIALS</p>
+        <h2>Customer Feedback & Reviews</h2>
+        <p>Real feedback from customers and kitchen experts.</p>
+      </div>
       <div class="products">
-        <article class="card" style="background:#1a1a1a; text-align:left;">
-          <div style="color:#d4af37;">★★★★★</div>
-          <p>"Zyka Gold ke masale bilkul fresh aur shuddh hain. Khane ka swad hi badal gaya!"</p>
-          <b style="color:#fff;">— Rajesh Kumar, Patna</b>
+        <article class="card">
+          <p style="font-size: 1.2rem; color: #d4af37; margin-bottom: 0.5rem;">★★★★★</p>
+          <p>"Red chilli powder ka colour aur aroma bilkul natural hai. Packaging standard level ki hai."</p>
+          <h3 style="margin-top: 1rem; font-size: 1rem;">Rajesh Kumar</h3>
+          <small>Verified Buyer</small>
         </article>
-        <article class="card" style="background:#1a1a1a; text-align:left;">
-          <div style="color:#d4af37;">★★★★★</div>
-          <p>"Red chilli powder ka colour natural hai aur packing bahut hi premium hai."</p>
-          <b style="color:#fff;">— Sunita Sharma, Bihar</b>
+        <article class="card">
+          <p style="font-size: 1.2rem; color: #d4af37; margin-bottom: 0.5rem;">★★★★★</p>
+          <p>"Dhaniya aur Haldi dono fresh aur bina kisi milawat ke hain. Swad me sach me farq padta hai."</p>
+          <h3 style="margin-top: 1rem; font-size: 1rem;">Pooja Sharma</h3>
+          <small>Home Chef</small>
         </article>
-      </div>
-      <div style="text-align: center; margin-top: 30px;">
-        <a class="btn outline" href="https://wa.me/918102942195?text=I%20want%20to%20give%20feedback%20for%20Zyka%20Gold" target="_blank">Share Your Review on WhatsApp</a>
+        <article class="card">
+          <p style="font-size: 1.2rem; color: #d4af37; margin-bottom: 0.5rem;">★★★★★</p>
+          <p>"Wholesale order ke delivery aur quality support dono kaafi smooth raha. Highly recommended."</p>
+          <h3 style="margin-top: 1rem; font-size: 1rem;">Amit Verma</h3>
+          <small>Retail Partner</small>
+        </article>
       </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="section">
-      <h2>Let's Talk</h2>
-      <p><b>Phone/WhatsApp:</b> +91 81029 42195</p>
-      <p><b>Email:</b> care.zykagold@gmail.com</p>
+    <section id="story" class="dark-section">
+      <div>
+        <p class="eyebrow">ABOUT ZYKA GOLD</p>
+        <h2>A premium spice brand with a simple promise.</h2>
+      </div>
+      <div>
+        <p>ZYKA GOLD is built around the idea that everyday spices deserve thoughtful sourcing, hygienic packaging and a premium experience.</p>
+        <p>Our vision is to bring dependable spice essentials to homes, retailers and businesses while keeping the brand honest and clear.</p>
+        <strong>Made for the Taste of India.</strong>
+      </div>
+    </section>
+
+    <section id="quality" class="section two-col">
+      <div>
+        <p class="eyebrow">QUALITY</p>
+        <h2>Care in every pack.</h2>
+      </div>
+      <div class="quality-list">
+        <div>
+          <h3>Quality-focused sourcing</h3>
+          <p>We focus on selecting suitable spice ingredients and maintaining a consistent product presentation.</p>
+        </div>
+        <div>
+          <h3>Hygienic packaging</h3>
+          <p>Products are packed with care and should be kept sealed when not in use.</p>
+        </div>
+        <div>
+          <h3>Storage guidance</h3>
+          <p>Store in a cool, dry place away from direct sunlight and moisture. Keep the pack properly closed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="retailer" class="dark-section split-cta">
+      <div>
+        <p class="eyebrow">GROW WITH US</p>
+        <h2>Become a Retailer or Distributor</h2>
+        <p>For wholesale quantities, business requirements and distribution opportunities, contact our team directly.</p>
+      </div>
+      <a class="btn gold" href="https://wa.me/916201453823?text=Hello%20ZYKA%20GOLD%2C%20I%20am%20interested%20in%20becoming%20a%20retailer%2Fdistributor.%20Please%20share%20the%20wholesale%20details." target="_blank" rel="noopener">Get Wholesale Quote</a>
+    </section>
+
+    <section id="faq" class="section">
+      <div class="section-head">
+        <p class="eyebrow">FAQ</p>
+        <h2>Questions, answered.</h2>
+      </div>
+      <div class="faq">
+        <details><summary>What pack sizes are available?</summary><p>50g, 100g, 200g, 500g and 1kg.</p></details>
+        <details><summary>Are product prices shown?</summary><p>No. Prices are currently not displayed. Retail orders are handled directly after enquiry.</p></details>
+        <details><summary>How do retail orders work?</summary><p>Select pack size, enter quantity and customer details, complete the confirmed UPI payment, then send payment confirmation on WhatsApp.</p></details>
+        <details><summary>How do wholesale orders work?</summary><p>Send your required quantity and business details through WhatsApp. Wholesale pricing is provided as a quote.</p></details>
+        <details><summary>How do I pay?</summary><p>Retail payment uses the displayed UPI ID after the order amount is confirmed. Wholesale payment is requested only after the amount is confirmed.</p></details>
+        <details><summary>What is the delivery process?</summary><p>Delivery and shipping details are confirmed with the customer during order confirmation. Wholesale delivery is handled through enquiry.</p></details>
+      </div>
+    </section>
+
+    <section id="contact" class="contact section">
+      <div>
+        <p class="eyebrow">CONTACT</p>
+        <h2>Let's talk.</h2>
+      </div>
+      <div class="contact-grid">
+        <a href="tel:+918102942195"><span>PHONE</span>+91 81029 42195</a>
+        <a href="https://wa.me/918102942195" target="_blank" rel="noopener"><span>WHATSAPP</span>+91 81029 42195</a>
+        <a href="mailto:care.zykagold@gmail.com"><span>EMAIL</span>care.zykagold@gmail.com</a>
+        <a href="https://instagram.com/zykagold" target="_blank" rel="noopener"><span>INSTAGRAM</span>@zykagold</a>
+        <div><span>LOCATION</span>Bihar, India</div>
+      </div>
     </section>
   </main>
 
   <footer>
+    <div class="logo"><span>ZYKA</span> GOLD</div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="shipping.html">Shipping</a>
+      <a href="refund.html">Cancellation / Refund</a>
+    </div>
     <p>© 2026 ZYKA GOLD. All rights reserved.</p>
   </footer>
+
+  <a class="wa-float" href="https://wa.me/918102942195?text=Hello%20ZYKA%20GOLD%2C%20I%20want%20to%20make%20an%20enquiry." target="_blank" rel="noopener" aria-label="WhatsApp">☏</a>
+
+  <div id="orderModal" class="modal" aria-hidden="true">
+    <div class="modal-box">
+      <button class="close" onclick="closeOrder()">×</button>
+      <p class="eyebrow">ORDER / ENQUIRY</p>
+      <h2 id="modalProduct">Product</h2>
+      <label>Order type
+        <select id="orderType" onchange="switchType()">
+          <option value="retail">Retail</option>
+          <option value="wholesale">Wholesale</option>
+        </select>
+      </label>
+      <div id="retailFields">
+        <label>Pack size
+          <select id="pack">
+            <option>50g</option>
+            <option>100g</option>
+            <option>200g</option>
+            <option>500g</option>
+            <option>1kg</option>
+          </select>
+        </label>
+        <label>Quantity<input id="qty" type="number" min="1" value="1"></label>
+      </div>
+      <div id="wholesaleFields" hidden>
+        <label>Required quantity<input id="wqty" placeholder="e.g. 50 kg"></label>
+        <p class="note">Wholesale pricing: Get Wholesale Quote</p>
+      </div>
+      <label>Your name<input id="name" placeholder="Full name"></label>
+      <label>Phone<input id="phone" placeholder="+91..." inputmode="tel"></label>
+      <label>City / Address<textarea id="address" rows="2" placeholder="Delivery/business details"></textarea></label>
+      <div id="paymentBox" class="payment">
+        <b>Retail UPI</b>
+        <span>8102942195-5@axl</span>
+        <button class="btn outline full" onclick="payUPI()">Pay via UPI</button>
+        <button class="btn gold full" onclick="paid()">I Have Paid</button>
+      </div>
+      <button id="waSubmit" class="btn gold full" onclick="sendWhatsApp()">Continue on WhatsApp</button>
+      <p class="note">Payment confirmation and screenshot can be sent in WhatsApp after payment.</p>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
