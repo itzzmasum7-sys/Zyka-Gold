@@ -12,7 +12,7 @@
   <title>ZYKA GOLD | Pure Taste. Premium Quality.</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body> 
   <header class="nav">
     <a class="logo" href="#home"><span>ZYKA</span> GOLD</a>
     <button class="menu" aria-label="Open menu" onclick="toggleMenu()">☰</button>
@@ -266,5 +266,305 @@
   </div>
 
   <script src="script.js"></script>
-</body>
+  
+<!-- ZYKA GOLD SMART ASSISTANT START -->
+
+<style>
+#zykaBotBtn{
+position:fixed;right:18px;bottom:18px;
+width:62px;height:62px;border:none;border-radius:50%;
+background:#111;color:#d4af37;font-size:28px;
+cursor:pointer;z-index:99999;
+box-shadow:0 8px 25px rgba(0,0,0,.35);
+}
+
+#zykaBotBox{
+display:none;position:fixed;right:18px;bottom:90px;
+width:360px;max-width:calc(100% - 24px);height:520px;
+background:#fff;border-radius:20px;overflow:hidden;
+z-index:99999;box-shadow:0 15px 45px rgba(0,0,0,.3);
+font-family:Arial,sans-serif;
+}
+
+.zykaHeader{
+background:#111;color:#d4af37;padding:15px;
+display:flex;justify-content:space-between;align-items:center;
+}
+
+.zykaHeader small{
+display:block;color:#ddd;margin-top:3px;
+}
+
+#zykaMessages{
+height:350px;overflow-y:auto;padding:14px;background:#f6f6f6;
+}
+
+.zykaBotMsg,.zykaUserMsg{
+max-width:82%;padding:10px 12px;margin:8px 0;
+border-radius:14px;line-height:1.45;font-size:14px;
+white-space:pre-wrap;
+}
+
+.zykaBotMsg{background:#fff;color:#222;}
+.zykaUserMsg{background:#111;color:#fff;margin-left:auto;}
+
+.zykaQuick{
+display:flex;gap:6px;overflow-x:auto;padding:8px;
+}
+
+.zykaQuick button{
+border:1px solid #d4af37;background:#fff;
+border-radius:18px;padding:7px 10px;white-space:nowrap;
+}
+
+.zykaInput{
+display:flex;gap:6px;padding:10px;border-top:1px solid #ddd;
+}
+
+.zykaInput input{
+flex:1;border:1px solid #ccc;border-radius:20px;
+padding:10px 12px;outline:none;
+}
+
+.zykaInput button{
+width:42px;border:none;border-radius:50%;
+background:#111;color:#d4af37;
+}
+</style>
+
+<button id="zykaBotBtn" onclick="toggleZykaBot()">🤖</button>
+
+<div id="zykaBotBox">
+
+<div class="zykaHeader">
+<div>
+<strong>✨ ZYKA Assistant</strong>
+<small>● Online • Customer Support</small>
+</div>
+<span onclick="toggleZykaBot()" style="font-size:22px;cursor:pointer;">×</span>
+</div>
+
+<div id="zykaMessages">
+
+<div class="zykaBotMsg">
+Namaste 👋
+
+Main ZYKA GOLD Smart Assistant hoon.
+
+Products, Retail, Wholesale, Order, Price ya Support ke baare me mujhse pooch sakte hain.
+</div>
+
+</div>
+
+<div class="zykaQuick">
+
+<button onclick="zykaQuickAsk('products')">🌶️ Products</button>
+
+<button onclick="zykaQuickAsk('wholesale')">📦 Wholesale</button>
+
+<button onclick="zykaQuickAsk('order')">🛒 Order</button>
+
+<button onclick="zykaQuickAsk('contact')">💬 Support</button>
+
+</div>
+
+<div class="zykaInput">
+
+<input
+id="zykaInputText"
+placeholder="Apna sawal likhiye..."
+onkeydown="if(event.key==='Enter') zykaSend()">
+
+<button onclick="zykaSend()">➤</button>
+
+</div>
+</div>
+
+<script>
+
+function toggleZykaBot(){
+
+const box=document.getElementById("zykaBotBox");
+
+box.style.display=
+box.style.display==="block"?"none":"block";
+
+}
+
+
+function zykaAddMessage(text,type){
+
+const messages=document.getElementById("zykaMessages");
+
+const msg=document.createElement("div");
+
+msg.className=
+type==="user"?"zykaUserMsg":"zykaBotMsg";
+
+msg.textContent=text;
+
+messages.appendChild(msg);
+
+messages.scrollTop=messages.scrollHeight;
+
+}
+
+
+function zykaQuickAsk(text){
+
+document.getElementById("zykaInputText").value=text;
+
+zykaSend();
+
+}
+
+
+function zykaSend(){
+
+const input=document.getElementById("zykaInputText");
+
+const text=input.value.trim();
+
+if(!text)return;
+
+zykaAddMessage(text,"user");
+
+input.value="";
+
+const q=text.toLowerCase();
+
+let reply="";
+
+
+if(
+q.includes("product")||
+q.includes("masala")||
+q.includes("haldi")||
+q.includes("mirch")||
+q.includes("dhaniya")||
+q.includes("jeera")
+){
+
+reply=`ZYKA GOLD ke products:
+
+🌿 Haldi Powder
+🌶️ Lal Mirch Powder
+🌱 Dhaniya Powder
+✨ Jeera
+
+Product aur pack size ki jankari ke liye Products section dekhein.`;
+
+}
+
+else if(
+q.includes("wholesale")||
+q.includes("bulk")||
+q.includes("dealer")||
+q.includes("dukan")||
+q.includes("shop")
+){
+
+reply=`📦 Wholesale Enquiry
+
+Wholesale ke liye ye details ready rakhein:
+
+• Name
+• Shop / Business Name
+• City / District
+• Required Product
+• Approx Quantity
+
+Website ke Wholesale/Contact option se enquiry bhej sakte hain.`;
+
+}
+
+else if(
+q.includes("order")||
+q.includes("buy")||
+q.includes("kharid")||
+q.includes("purchase")
+){
+
+reply=`🛒 ZYKA GOLD Order
+
+Website ke Retail ya Wholesale option se order/enquiry karein.
+
+WhatsApp option available ho to direct WhatsApp se bhi contact kar sakte hain.`;
+
+}
+
+else if(
+q.includes("price")||
+q.includes("rate")||
+q.includes("mrp")||
+q.includes("kitna")||
+q.includes("kitne")
+){
+
+reply=`💰 Price Information
+
+Price product aur pack size par depend karta hai.
+
+Current price ke liye ZYKA GOLD sales/support team se confirm karein.`;
+
+}
+
+else if(
+q.includes("contact")||
+q.includes("support")||
+q.includes("help")||
+q.includes("whatsapp")||
+q.includes("phone")
+){
+
+reply=`💬 ZYKA GOLD Support
+
+Customer support ke liye website ke Contact ya WhatsApp option ka use karein.
+
+Hamari team aapki enquiry me help karegi.`;
+
+}
+
+else if(
+q.includes("hello")||
+q.includes("hi")||
+q.includes("hey")||
+q.includes("namaste")
+){
+
+reply=`Namaste 👋
+
+ZYKA GOLD me aapka swagat hai.
+
+Main Products, Wholesale, Retail, Order, Price aur Support me madad kar sakta hoon.`;
+
+}
+
+else{
+
+reply=`🤖 Main ZYKA GOLD Smart Assistant hoon.
+
+Aap mujhse pooch sakte hain:
+
+• Products kya hain?
+• Wholesale kaise milega?
+• Order kaise karu?
+• Price kya hai?
+• Customer support chahiye`;
+
+}
+
+
+setTimeout(function(){
+
+zykaAddMessage(reply,"bot");
+
+},350);
+
+}
+
+</script>
+  </body>
 </html>
+
+<!-- ZYKA GOLD SMART ASSISTANT END -->
