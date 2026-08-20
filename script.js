@@ -1,417 +1,376 @@
-const CONFIG = {
-  whatsapp: "918102942195",
-  upiId: "8102942195-5@axl",
-  payeeName: "ZYKA GOLD",
-  currency: "INR",
-  aiEndpoint: ""
-};
+"use strict";
 
-const PRODUCTS = [
-  {
-    id: "turmeric",
-    name: "Turmeric Powder",
-    image: "turmeric.png",
-    desc: "Warm, earthy spice for everyday Indian cooking.",
-    badge: "BEST",
-    tags: ["haldi", "turmeric", "best"],
-    prices: {
-      "50g": 0,
-      "100g": 0,
-      "200g": 0,
-      "500g": 0,
-      "1kg": 0
-    }
-  },
-  {
-    id: "chilli",
-    name: "Red Chilli Powder",
-    image: "red-chilli.png",
-    desc: "Bold colour and balanced heat for Indian recipes.",
-    badge: "BEST",
-    tags: ["mirch", "chilli", "lal mirch", "best"],
-    prices: {
-      "50g": 0,
-      "100g": 0,
-      "200g": 0,
-      "500g": 0,
-      "1kg": 0
-    }
-  },
-  {
-    id: "coriander",
-    name: "Coriander Powder",
-    image: "coriander.png",
-    desc: "Aromatic and versatile for curries, gravies and blends.",
-    badge: "",
-    tags: ["dhaniya", "coriander"],
-    prices: {
-      "50g": 0,
-      "100g": 0,
-      "200g": 0,
-      "500g": 0,
-      "1kg": 0
-    }
-  },
-  {
-    id: "cumin",
-    name: "Cumin Powder",
-    image: "cumin.png",
-    desc: "Distinctive earthy aroma for everyday authentic dishes.",
-    badge: "NEW",
-    tags: ["jeera", "cumin", "new"],
-    prices: {
-      "50g": 0,
-      "100g": 0,
-      "200g": 0,
-      "500g": 0,
-      "1kg": 0
+const ZYKA = {
+  whatsapp: "918102942195",
+  email: "care.zykagold@gmail.com",
+
+  products: {
+    turmeric: {
+      name: "Turmeric Powder",
+      image: "turmeric.png",
+      aliases: ["haldi", "turmeric"]
+    },
+
+    chilli: {
+      name: "Red Chilli Powder",
+      image: "red-chilli.png",
+      aliases: ["mirch", "lal mirch", "red chilli", "chilli"]
+    },
+
+    coriander: {
+      name: "Coriander Powder",
+      image: "coriander.png",
+      aliases: ["dhaniya", "coriander"]
+    },
+
+    cumin: {
+      name: "Cumin Powder",
+      image: "cumin.png",
+      aliases: ["jeera", "cumin"]
     }
   }
-];
-
-let cart = JSON.parse(localStorage.getItem("zykaCart") || "[]");
-let wishlist = JSON.parse(localStorage.getItem("zykaWishlist") || "[]");
-
-let coupon = {
-  code: "",
-  discount: 0
 };
 
-function money(n) {
-  return n > 0
-    ? "₹" + n.toFixed(0)
-    : "WhatsApp for Price";
+let cart = [];
+let wishlist = [];
+
+function loadSavedData() {
+  try {
+    cart = JSON.parse(
+      localStorage.getItem("zykaCartV3") || "[]"
+    );
+
+    wishlist = JSON.parse(
+      localStorage.getItem("zykaWishlistV3") || "[]"
+    );
+
+    if (!Array.isArray(cart)) {
+      cart = [];
+    }
+
+    if (!Array.isArray(wishlist)) {
+      wishlist = [];
+    }
+  } catch (error) {
+    cart = [];
+    wishlist = [];
+  }
 }
 
-function saveState() {
-  localStorage.setItem("zykaCart", JSON.stringify(cart));
-  localStorage.setItem("zykaWishlist", JSON.stringify(wishlist));
+function saveData() {
+  localStorage.setItem(
+    "zykaCartV3",
+    JSON.stringify(cart)
+  );
+
+  localStorage.setItem(
+    "zykaWishlistV3",
+    JSON.stringify(wishlist)
+  );
+
   updateCounts();
 }
 
-function toggleMenu() {
-  const nav = document.getElementById("navLinks");
+function getProduct(id) {
+  return ZYKA.products[id] || null;
+}
 
-  nav.style.display =
-    nav.style.display === "flex"
-      ? "none"
-      : "flex";
+function getPack(id) {
+  const select = document.querySelector(
+    `[data-pack="${id}"]`
+  );
+
+  return select ? select.value : "100g";
 }
 
 function updateCounts() {
-  document.getElementById("cartCount").textContent =
-    cart.reduce((a, b) => a + b.qty, 0);
-
-  document.getElementById("wishlistCount").textContent =
-    wishlist.length;
-}
-
-function renderProducts() {
-  const q =
-    (
-      document.getElementById("productSearch")?.value || ""
-    )
-      .toLowerCase()
-      .trim();
-
-  const filter =
-    document.getElementById("productFilter")?.value || "all";
-
-  const grid = document.getElementById("productGrid");
-
-  const list = PRODUCTS.filter((product) => {
-    const text = (
-      product.name +
-      " " +
-      product.desc +
-      " " +
-      product.tags.join(" ")
-    ).toLowerCase();
-
-    const matchesSearch =
-      !q || text.includes(q);
-
-    const matchesFilter =
-      filter === "all" ||
-      product.tags.includes(filter);
-
-    return matchesSearch && matchesFilter;
-  });
-
-  grid.innerHTML =
-    list
-      .map((product) => {
-        const defaultPack = "100g";
-        const price = product.prices[defaultPack] || 0;
-
-        const active =
-          wishlist.includes(product.id)
-            ? "active"
-            : "";
-
-        return `
-          <article class="card">
-
-            ${
-              product.badge
-                ? `<span class="badge">${product.badge}</span>`
-                : ""
-            }
-
-            <button
-              class="wish ${active}"
-              onclick="toggleWishlist('${product.id}')"
-              aria-label="Wishlist"
-            >
-              ♡
-            </button>
-
-            <div class="product-art">
-              <img
-                src="${product.image}"
-                alt="ZYKA GOLD ${product.name}"
-              >
-            </div>
-
-            <h3>${product.name}</h3>
-
-            <p>${product.desc}</p>
-
-            <small>
-              Pack sizes:
-              50g · 100g · 200g · 500g · 1kg
-            </small>
-
-            <select
-              class="pack-select"
-              id="pack-${product.id}"
-              onchange="updateCardPrice('${product.id}')"
-            >
-              ${Object.keys(product.prices)
-                .map(
-                  (size) =>
-                    `<option>${size}</option>`
-                )
-                .join("")}
-            </select>
-
-            <div class="price-row">
-              <strong id="price-${product.id}">
-                ${money(price)}
-              </strong>
-
-              <small>Retail</small>
-            </div>
-
-            <div class="card-actions">
-
-              <button
-                class="btn outline"
-                onclick="buyNow('${product.id}')"
-              >
-                Buy Now
-              </button>
-
-              <button
-                class="btn gold"
-                onclick="addToCart('${product.id}')"
-              >
-                Add to Cart
-              </button>
-
-            </div>
-
-          </article>
-        `;
-      })
-      .join("") ||
-    `
-      <div class="empty-state">
-        No product found.
-      </div>
-    `;
-}
-
-function updateCardPrice(id) {
-  const product =
-    PRODUCTS.find(
-      (item) => item.id === id
+  const cartCount =
+    cart.reduce(
+      (total, item) =>
+        total + Number(item.qty || 0),
+      0
     );
 
-  const pack =
+  const cartCountEl =
     document.getElementById(
-      "pack-" + id
-    ).value;
+      "cartCount"
+    );
 
-  document.getElementById(
-    "price-" + id
-  ).textContent =
-    money(product.prices[pack] || 0);
+  const wishlistCountEl =
+    document.getElementById(
+      "wishlistCount"
+    );
+
+  if (cartCountEl) {
+    cartCountEl.textContent =
+      cartCount;
+  }
+
+  if (wishlistCountEl) {
+    wishlistCountEl.textContent =
+      wishlist.length;
+  }
 }
 
-function toggleWishlist(id) {
-  if (wishlist.includes(id)) {
-    wishlist =
-      wishlist.filter(
-        (item) => item !== id
+/* =========================
+   MENU
+========================= */
+
+function setupMenu() {
+  const menuBtn =
+    document.getElementById(
+      "menuBtn"
+    );
+
+  const nav =
+    document.getElementById(
+      "mainNav"
+    );
+
+  if (!menuBtn || !nav) {
+    return;
+  }
+
+  menuBtn.addEventListener(
+    "click",
+    function () {
+      nav.classList.toggle(
+        "show"
       );
-  } else {
-    wishlist.push(id);
-  }
+    }
+  );
 
-  saveState();
-  renderProducts();
+  nav
+    .querySelectorAll("a")
+    .forEach(function (link) {
+      link.addEventListener(
+        "click",
+        function () {
+          nav.classList.remove(
+            "show"
+          );
+        }
+      );
+    });
+}
 
-  if (
-    document
-      .getElementById("wishlistDrawer")
-      .classList.contains("show")
-  ) {
-    renderWishlist();
+/* =========================
+   PRODUCT SEARCH
+========================= */
+
+function filterProducts() {
+  const search =
+    document.getElementById(
+      "productSearch"
+    );
+
+  const filter =
+    document.getElementById(
+      "productFilter"
+    );
+
+  const noProducts =
+    document.getElementById(
+      "noProducts"
+    );
+
+  const query =
+    search
+      ? search.value
+          .trim()
+          .toLowerCase()
+      : "";
+
+  const filterValue =
+    filter
+      ? filter.value
+      : "all";
+
+  let visibleCount = 0;
+
+  document
+    .querySelectorAll(
+      ".product-card"
+    )
+    .forEach(function (card) {
+      const name =
+        (
+          card.dataset.name || ""
+        ).toLowerCase();
+
+      const tags =
+        (
+          card.dataset.tags || ""
+        ).toLowerCase();
+
+      const text =
+        name + " " + tags;
+
+      const matchesSearch =
+        !query ||
+        text.includes(query);
+
+      let matchesFilter = true;
+
+      if (
+        filterValue === "best"
+      ) {
+        matchesFilter =
+          tags.includes("best");
+      }
+
+      if (
+        filterValue === "new"
+      ) {
+        matchesFilter =
+          tags.includes("new");
+      }
+
+      const show =
+        matchesSearch &&
+        matchesFilter;
+
+      card.hidden = !show;
+
+      if (show) {
+        visibleCount++;
+      }
+    });
+
+  if (noProducts) {
+    noProducts.hidden =
+      visibleCount !== 0;
   }
 }
+
+function setupSearch() {
+  const search =
+    document.getElementById(
+      "productSearch"
+    );
+
+  const filter =
+    document.getElementById(
+      "productFilter"
+    );
+
+  if (search) {
+    search.addEventListener(
+      "input",
+      filterProducts
+    );
+  }
+
+  if (filter) {
+    filter.addEventListener(
+      "change",
+      filterProducts
+    );
+  }
+}
+
+/* =========================
+   CART
+========================= */
 
 function addToCart(id) {
   const product =
-    PRODUCTS.find(
-      (item) => item.id === id
-    );
+    getProduct(id);
+
+  if (!product) {
+    return;
+  }
 
   const pack =
-    document.getElementById(
-      "pack-" + id
-    )?.value || "100g";
+    getPack(id);
 
   const existing =
     cart.find(
-      (item) =>
-        item.id === id &&
-        item.pack === pack
+      function (item) {
+        return (
+          item.id === id &&
+          item.pack === pack
+        );
+      }
     );
 
   if (existing) {
-    existing.qty++;
+    existing.qty += 1;
   } else {
     cart.push({
-      id,
-      pack,
+      id: id,
+      pack: pack,
       qty: 1
     });
   }
 
-  saveState();
+  saveData();
   renderCart();
-  openCart();
+  openDrawer("cart");
 }
 
-function buyNow(id) {
-  addToCart(id);
-  openCheckout();
-}
+function removeFromCart(index) {
+  if (!cart[index]) {
+    return;
+  }
 
-function linePrice(item) {
-  const product =
-    PRODUCTS.find(
-      (p) => p.id === item.id
-    );
+  cart.splice(index, 1);
 
-  return (
-    (product.prices[item.pack] || 0) *
-    item.qty
-  );
-}
-
-function subtotal() {
-  return cart.reduce(
-    (sum, item) =>
-      sum + linePrice(item),
-    0
-  );
-}
-
-function total() {
-  const sub = subtotal();
-
-  return Math.max(
-    0,
-    sub -
-      (sub * coupon.discount) / 100
-  );
-}
-
-function allPricesReady() {
-  return (
-    cart.length > 0 &&
-    cart.every(
-      (item) => linePrice(item) > 0
-    )
-  );
-}
-
-function openCart() {
-  closeDrawers();
-
-  document
-    .getElementById("cartDrawer")
-    .classList.add("show");
-
-  document
-    .getElementById("drawerOverlay")
-    .classList.add("show");
-
+  saveData();
   renderCart();
 }
 
-function openWishlist() {
-  closeDrawers();
+function changeCartQty(
+  index,
+  amount
+) {
+  if (!cart[index]) {
+    return;
+  }
 
-  document
-    .getElementById("wishlistDrawer")
-    .classList.add("show");
+  cart[index].qty += amount;
 
-  document
-    .getElementById("drawerOverlay")
-    .classList.add("show");
+  if (cart[index].qty < 1) {
+    cart.splice(index, 1);
+  }
 
-  renderWishlist();
-}
-
-function closeDrawers() {
-  document
-    .querySelectorAll(".drawer")
-    .forEach((drawer) =>
-      drawer.classList.remove("show")
-    );
-
-  document
-    .getElementById("drawerOverlay")
-    .classList.remove("show");
+  saveData();
+  renderCart();
 }
 
 function renderCart() {
-  const el =
+  const container =
     document.getElementById(
       "cartItems"
     );
 
+  if (!container) {
+    return;
+  }
+
   if (!cart.length) {
-    el.innerHTML = `
-      <div class="empty-state">
+    container.innerHTML = `
+      <div class="empty-message">
         Your cart is empty.
       </div>
     `;
-  } else {
-    el.innerHTML =
-      cart
-        .map((item, index) => {
+
+    return;
+  }
+
+  container.innerHTML =
+    cart
+      .map(
+        function (item, index) {
           const product =
-            PRODUCTS.find(
-              (p) =>
-                p.id === item.id
-            );
+            getProduct(item.id);
+
+          if (!product) {
+            return "";
+          }
 
           return `
-            <div class="cart-item">
+            <div class="cart-row">
 
               <img
                 src="${product.image}"
@@ -426,19 +385,13 @@ function renderCart() {
 
                 <small>
                   ${item.pack}
-                  ·
-                  ${money(
-                    product.prices[
-                      item.pack
-                    ] || 0
-                  )}
                 </small>
 
-                <div class="qty-controls">
+                <div class="qty-row">
 
                   <button
-                    onclick="changeQty(${index}, -1)"
-                  >
+                    type="button"
+                    data-minus="${index}">
                     −
                   </button>
 
@@ -447,8 +400,8 @@ function renderCart() {
                   </span>
 
                   <button
-                    onclick="changeQty(${index}, 1)"
-                  >
+                    type="button"
+                    data-plus="${index}">
                     +
                   </button>
 
@@ -457,666 +410,944 @@ function renderCart() {
               </div>
 
               <button
-                class="remove"
-                onclick="removeCart(${index})"
-              >
+                type="button"
+                class="remove-item"
+                data-remove="${index}">
                 ×
               </button>
 
             </div>
           `;
-        })
-        .join("");
+        }
+      )
+      .join("");
+
+  container
+    .querySelectorAll(
+      "[data-minus]"
+    )
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            changeCartQty(
+              Number(
+                button.dataset.minus
+              ),
+              -1
+            );
+          }
+        );
+      }
+    );
+
+  container
+    .querySelectorAll(
+      "[data-plus]"
+    )
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            changeCartQty(
+              Number(
+                button.dataset.plus
+              ),
+              1
+            );
+          }
+        );
+      }
+    );
+
+  container
+    .querySelectorAll(
+      "[data-remove]"
+    )
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            removeFromCart(
+              Number(
+                button.dataset.remove
+              )
+            );
+          }
+        );
+      }
+    );
+}
+
+/* =========================
+   BUY NOW
+========================= */
+
+function buyNow(id) {
+  const product =
+    getProduct(id);
+
+  if (!product) {
+    return;
   }
 
-  document.getElementById(
-    "cartTotal"
-  ).textContent =
-    allPricesReady()
-      ? money(total())
-      : "Price on WhatsApp";
+  const pack =
+    getPack(id);
+
+  cart = [
+    {
+      id: id,
+      pack: pack,
+      qty: 1
+    }
+  ];
+
+  saveData();
+  renderCart();
+  openCheckout();
+}
+
+/* =========================
+   WISHLIST
+========================= */
+
+function toggleWishlist(id) {
+  const exists =
+    wishlist.includes(id);
+
+  if (exists) {
+    wishlist =
+      wishlist.filter(
+        function (item) {
+          return item !== id;
+        }
+      );
+  } else {
+    wishlist.push(id);
+  }
+
+  saveData();
+  updateWishlistButtons();
+  renderWishlist();
+}
+
+function updateWishlistButtons() {
+  document
+    .querySelectorAll(
+      "[data-wishlist]"
+    )
+    .forEach(
+      function (button) {
+        const id =
+          button.dataset.wishlist;
+
+        button.classList.toggle(
+          "active",
+          wishlist.includes(id)
+        );
+      }
+    );
 }
 
 function renderWishlist() {
-  const el =
+  const container =
     document.getElementById(
       "wishlistItems"
     );
 
-  const list =
-    wishlist
-      .map((id) =>
-        PRODUCTS.find(
-          (product) =>
-            product.id === id
-        )
-      )
-      .filter(Boolean);
+  if (!container) {
+    return;
+  }
 
-  if (!list.length) {
-    el.innerHTML = `
-      <div class="empty-state">
-        No favourites yet.
+  if (!wishlist.length) {
+    container.innerHTML = `
+      <div class="empty-message">
+        Your wishlist is empty.
       </div>
     `;
 
     return;
   }
 
-  el.innerHTML =
-    list
+  container.innerHTML =
+    wishlist
       .map(
-        (product) => `
-          <div class="cart-item">
+        function (id) {
+          const product =
+            getProduct(id);
 
-            <img
-              src="${product.image}"
-              alt="${product.name}"
-            >
+          if (!product) {
+            return "";
+          }
 
-            <div>
+          return `
+            <div class="cart-row">
 
-              <h4>
-                ${product.name}
-              </h4>
+              <img
+                src="${product.image}"
+                alt="${product.name}"
+              >
 
-              <small>
-                ${product.desc}
-              </small>
+              <div>
+
+                <h4>
+                  ${product.name}
+                </h4>
+
+                <small>
+                  Price on WhatsApp
+                </small>
+
+                <button
+                  type="button"
+                  class="btn btn-outline"
+                  data-wishlist-buy="${id}">
+                  View Product
+                </button>
+
+              </div>
 
               <button
-                class="btn outline full"
-                onclick="
-                  closeDrawers();
-                  document
-                    .getElementById(
-                      'pack-${product.id}'
-                    )
-                    ?.scrollIntoView({
-                      behavior:'smooth'
-                    });
-                "
-              >
-                View Product
+                type="button"
+                class="remove-item"
+                data-wishlist-remove="${id}">
+                ×
               </button>
 
             </div>
-
-            <button
-              class="remove"
-              onclick="toggleWishlist('${product.id}')"
-            >
-              ×
-            </button>
-
-          </div>
-        `
+          `;
+        }
       )
       .join("");
-}
 
-function changeQty(index, change) {
-  cart[index].qty += change;
-
-  if (cart[index].qty < 1) {
-    cart.splice(index, 1);
-  }
-
-  saveState();
-  renderCart();
-}
-
-function removeCart(index) {
-  cart.splice(index, 1);
-
-  saveState();
-  renderCart();
-}
-
-function applyCoupon() {
-  const code =
-    (
-      document.getElementById(
-        "couponInput"
-      ).value || ""
+  container
+    .querySelectorAll(
+      "[data-wishlist-remove]"
     )
-      .trim()
-      .toUpperCase();
-
-  coupon = {
-    code: "",
-    discount: 0
-  };
-
-  if (code === "WELCOME5") {
-    coupon = {
-      code: "WELCOME5",
-      discount: 5
-    };
-
-    alert(
-      "WELCOME5 applied: 5% off."
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            toggleWishlist(
+              button.dataset
+                .wishlistRemove
+            );
+          }
+        );
+      }
     );
-  } else if (code) {
-    alert(
-      "Coupon not valid."
+
+  container
+    .querySelectorAll(
+      "[data-wishlist-buy]"
+    )
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            closeDrawers();
+
+            const id =
+              button.dataset
+                .wishlistBuy;
+
+            const card =
+              document.querySelector(
+                `[data-id="${id}"]`
+              );
+
+            if (card) {
+              card.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+              });
+            }
+          }
+        );
+      }
+    );
+}
+
+/* =========================
+   DRAWERS
+========================= */
+
+function openDrawer(type) {
+  const overlay =
+    document.getElementById(
+      "drawerOverlay"
+    );
+
+  const cartDrawer =
+    document.getElementById(
+      "cartDrawer"
+    );
+
+  const wishlistDrawer =
+    document.getElementById(
+      "wishlistDrawer"
+    );
+
+  if (cartDrawer) {
+    cartDrawer.classList.remove(
+      "show"
     );
   }
 
-  renderCart();
+  if (wishlistDrawer) {
+    wishlistDrawer.classList.remove(
+      "show"
+    );
+  }
+
+  if (
+    type === "cart" &&
+    cartDrawer
+  ) {
+    renderCart();
+    cartDrawer.classList.add(
+      "show"
+    );
+  }
+
+  if (
+    type === "wishlist" &&
+    wishlistDrawer
+  ) {
+    renderWishlist();
+    wishlistDrawer.classList.add(
+      "show"
+    );
+  }
+
+  if (overlay) {
+    overlay.classList.add(
+      "show"
+    );
+  }
+}
+
+function closeDrawers() {
+  document
+    .querySelectorAll(
+      ".drawer"
+    )
+    .forEach(
+      function (drawer) {
+        drawer.classList.remove(
+          "show"
+        );
+      }
+    );
+
+  const overlay =
+    document.getElementById(
+      "drawerOverlay"
+    );
+
+  if (overlay) {
+    overlay.classList.remove(
+      "show"
+    );
+  }
+}
+
+function setupDrawers() {
+  const cartBtn =
+    document.getElementById(
+      "cartBtn"
+    );
+
+  const wishlistBtn =
+    document.getElementById(
+      "wishlistBtn"
+    );
+
+  const mobileCartBtn =
+    document.getElementById(
+      "mobileCartBtn"
+    );
+
+  const mobileWishlistBtn =
+    document.getElementById(
+      "mobileWishlistBtn"
+    );
+
+  const overlay =
+    document.getElementById(
+      "drawerOverlay"
+    );
+
+  if (cartBtn) {
+    cartBtn.addEventListener(
+      "click",
+      function () {
+        openDrawer("cart");
+      }
+    );
+  }
+
+  if (wishlistBtn) {
+    wishlistBtn.addEventListener(
+      "click",
+      function () {
+        openDrawer(
+          "wishlist"
+        );
+      }
+    );
+  }
+
+  if (mobileCartBtn) {
+    mobileCartBtn.addEventListener(
+      "click",
+      function () {
+        openDrawer("cart");
+      }
+    );
+  }
+
+  if (mobileWishlistBtn) {
+    mobileWishlistBtn.addEventListener(
+      "click",
+      function () {
+        openDrawer(
+          "wishlist"
+        );
+      }
+    );
+  }
+
+  if (overlay) {
+    overlay.addEventListener(
+      "click",
+      closeDrawers
+    );
+  }
+
+  document
+    .querySelectorAll(
+      "[data-close-drawer]"
+    )
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          closeDrawers
+        );
+      }
+    );
+}
+
+/* =========================
+   PRODUCT BUTTONS
+========================= */
+
+function setupProductButtons() {
+  document
+    .querySelectorAll(
+      "[data-cart]"
+    )
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            addToCart(
+              button.dataset.cart
+            );
+          }
+        );
+      }
+    );
+
+  document
+    .querySelectorAll(
+      "[data-buy]"
+    )
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            buyNow(
+              button.dataset.buy
+            );
+          }
+        );
+      }
+    );
+
+  document
+    .querySelectorAll(
+      "[data-wishlist]"
+    )
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            toggleWishlist(
+              button.dataset
+                .wishlist
+            );
+          }
+        );
+      }
+    );
+}
+
+/* =========================
+   CHECKOUT
+========================= */
+
+function cartSummaryText() {
+  if (!cart.length) {
+    return "";
+  }
+
+  return cart
+    .map(
+      function (item) {
+        const product =
+          getProduct(item.id);
+
+        if (!product) {
+          return "";
+        }
+
+        return (
+          product.name +
+          " | " +
+          item.pack +
+          " x " +
+          item.qty
+        );
+      }
+    )
+    .filter(Boolean)
+    .join("\n");
+}
+
+function renderCheckoutSummary() {
+  const container =
+    document.getElementById(
+      "checkoutSummary"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  if (!cart.length) {
+    container.innerHTML =
+      "Your cart is empty.";
+
+    return;
+  }
+
+  container.innerHTML =
+    cart
+      .map(
+        function (item) {
+          const product =
+            getProduct(item.id);
+
+          if (!product) {
+            return "";
+          }
+
+          return `
+            <div>
+              ${product.name}
+              • ${item.pack}
+              × ${item.qty}
+            </div>
+          `;
+        }
+      )
+      .join("") +
+    `
+      <br>
+      <strong>
+        Current price will be confirmed on WhatsApp.
+      </strong>
+    `;
 }
 
 function openCheckout() {
   if (!cart.length) {
     alert(
-      "Cart is empty."
+      "Please add a product first."
     );
 
     return;
   }
 
   closeDrawers();
+  renderCheckoutSummary();
 
-  document
-    .getElementById(
+  const modal =
+    document.getElementById(
       "checkoutModal"
-    )
-    .classList.add("show");
+    );
 
-  document
-    .getElementById(
-      "checkoutModal"
-    )
-    .setAttribute(
+  if (modal) {
+    modal.classList.add(
+      "show"
+    );
+
+    modal.setAttribute(
       "aria-hidden",
       "false"
     );
-
-  renderCheckout();
+  }
 }
 
 function closeCheckout() {
-  document
-    .getElementById(
+  const modal =
+    document.getElementById(
       "checkoutModal"
-    )
-    .classList.remove("show");
+    );
 
-  document
-    .getElementById(
-      "checkoutModal"
-    )
-    .setAttribute(
+  if (modal) {
+    modal.classList.remove(
+      "show"
+    );
+
+    modal.setAttribute(
       "aria-hidden",
       "true"
     );
-}
-
-function renderCheckout() {
-  const lines =
-    cart
-      .map((item) => {
-        const product =
-          PRODUCTS.find(
-            (p) =>
-              p.id === item.id
-          );
-
-        return `
-          <div>
-            <span>
-              ${product.name}
-              ·
-              ${item.pack}
-              ×
-              ${item.qty}
-            </span>
-
-            <strong>
-              ${money(
-                linePrice(item)
-              )}
-            </strong>
-          </div>
-        `;
-      })
-      .join("");
-
-  document.getElementById(
-    "checkoutSummary"
-  ).innerHTML =
-    lines +
-    `
-      <hr>
-
-      <div>
-        <span>
-          Total
-        </span>
-
-        <strong>
-          ${
-            allPricesReady()
-              ? money(total())
-              : "Confirm price on WhatsApp"
-          }
-        </strong>
-      </div>
-    `;
-
-  const button =
-    document.getElementById(
-      "upiPayBtn"
-    );
-
-  button.disabled = false;
-
-  button.textContent =
-    allPricesReady()
-      ? "Pay via UPI"
-      : "Ask Price on WhatsApp";
-}
-
-function customerDetails() {
-  return {
-    name:
-      document
-        .getElementById(
-          "cName"
-        )
-        .value.trim(),
-
-    phone:
-      document
-        .getElementById(
-          "cPhone"
-        )
-        .value.trim(),
-
-    address:
-      document
-        .getElementById(
-          "cAddress"
-        )
-        .value.trim()
-  };
-}
-
-function validCustomer() {
-  const details =
-    customerDetails();
-
-  if (
-    !details.name ||
-    !details.phone ||
-    !details.address
-  ) {
-    alert(
-      "Please enter name, phone and full address."
-    );
-
-    return false;
   }
-
-  return true;
 }
 
-function orderId() {
-  return (
-    "ZG" +
-    Date.now()
-      .toString()
-      .slice(-8)
-  );
-}
-
-function orderText() {
-  const details =
-    customerDetails();
-
-  const id = orderId();
-
-  let message =
-    `Hello ZYKA GOLD,\n\n` +
-    `RETAIL ORDER / PRICE ENQUIRY\n` +
-    `Order ID: ${id}\n`;
-
-  cart.forEach((item) => {
-    const product =
-      PRODUCTS.find(
-        (p) =>
-          p.id === item.id
-      );
-
-    message +=
-      `\n${product.name}` +
-      ` | ${item.pack}` +
-      ` x ${item.qty}` +
-      ` | ${money(
-        linePrice(item)
-      )}`;
-  });
-
-  if (allPricesReady()) {
-    message +=
-      `\n\nTotal: ${money(total())}`;
-  } else {
-    message +=
-      `\n\nPrice: Please confirm current price on WhatsApp.`;
-  }
-
-  message +=
-    `\nName: ${details.name}` +
-    `\nPhone: ${details.phone}` +
-    `\nAddress: ${details.address}`;
-
-  if (coupon.code) {
-    message +=
-      `\nCoupon: ${coupon.code}`;
-  }
-
-  message +=
-    `\n\nPlease confirm availability, final price and delivery details.`;
-
-  return message;
-}
-
-function checkoutWhatsApp() {
-  if (!validCustomer()) {
-    return;
-  }
-
-  window.open(
-    `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(
-      orderText()
-    )}`,
-    "_blank"
-  );
-}
-
-function checkoutUPI() {
-  if (!validCustomer()) {
-    return;
-  }
-
-  if (!allPricesReady()) {
-    checkoutWhatsApp();
-    return;
-  }
-
-  const details =
-    customerDetails();
-
-  const note =
-    `ZYKA GOLD order for ${details.name}`;
-
-  const url =
-    `upi://pay?` +
-    `pa=${encodeURIComponent(
-      CONFIG.upiId
-    )}` +
-    `&pn=${encodeURIComponent(
-      CONFIG.payeeName
-    )}` +
-    `&am=${total().toFixed(2)}` +
-    `&cu=${CONFIG.currency}` +
-    `&tn=${encodeURIComponent(
-      note
-    )}`;
-
-  window.location.href = url;
-}
-
-function sendWholesale(event) {
-  event.preventDefault();
-
+function sendOrderWhatsApp() {
   const name =
     document
       .getElementById(
-        "wName"
+        "customerName"
       )
-      .value.trim();
-
-  const business =
-    document
-      .getElementById(
-        "wBusiness"
-      )
-      .value.trim();
+      ?.value.trim() || "";
 
   const phone =
     document
       .getElementById(
-        "wPhone"
+        "customerPhone"
       )
-      .value.trim();
+      ?.value.trim() || "";
 
-  const city =
+  const address =
     document
       .getElementById(
-        "wCity"
+        "customerAddress"
       )
-      .value.trim();
+      ?.value.trim() || "";
 
-  const product =
-    document
-      .getElementById(
-        "wProduct"
-      )
-      .value;
+  if (!name) {
+    alert(
+      "Please enter your name."
+    );
+    return;
+  }
 
-  const qty =
-    document
-      .getElementById(
-        "wQty"
-      )
-      .value.trim();
+  if (!phone) {
+    alert(
+      "Please enter your phone number."
+    );
+    return;
+  }
+
+  if (!address) {
+    alert(
+      "Please enter delivery address."
+    );
+    return;
+  }
+
+  const orderId =
+    "ZG" +
+    Date.now()
+      .toString()
+      .slice(-8);
 
   const message =
-    `Hello ZYKA GOLD,\n\n` +
-    `WHOLESALE / DISTRIBUTOR ENQUIRY\n` +
-    `Name: ${name}\n` +
-    `Business: ${business || "Not specified"}\n` +
-    `Phone: ${phone}\n` +
-    `City / District: ${city}\n` +
-    `Product: ${product}\n` +
-    `Approx Quantity: ${qty || "Not specified"}\n\n` +
-    `Please share current wholesale price and details.`;
+    `Hello ZYKA GOLD,
+
+RETAIL ORDER / PRICE ENQUIRY
+
+Order ID: ${orderId}
+
+${cartSummaryText()}
+
+Name: ${name}
+Phone: ${phone}
+Address: ${address}
+
+Please confirm current price, availability and delivery details.`;
 
   window.open(
-    `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(
+    `https://wa.me/${ZYKA.whatsapp}?text=${encodeURIComponent(
       message
     )}`,
     "_blank"
   );
 }
 
+function setupCheckout() {
+  const checkoutBtn =
+    document.getElementById(
+      "checkoutBtn"
+    );
+
+  const closeBtn =
+    document.getElementById(
+      "closeCheckout"
+    );
+
+  const whatsappBtn =
+    document.getElementById(
+      "checkoutWhatsApp"
+    );
+
+  const modal =
+    document.getElementById(
+      "checkoutModal"
+    );
+
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener(
+      "click",
+      openCheckout
+    );
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener(
+      "click",
+      closeCheckout
+    );
+  }
+
+  if (whatsappBtn) {
+    whatsappBtn.addEventListener(
+      "click",
+      sendOrderWhatsApp
+    );
+  }
+
+  if (modal) {
+    modal.addEventListener(
+      "click",
+      function (event) {
+        if (
+          event.target === modal
+        ) {
+          closeCheckout();
+        }
+      }
+    );
+  }
+}
+
 /* =========================
-   ZYKA ASSISTANT PRO
+   WHOLESALE
 ========================= */
 
-function toggleZykaBot() {
-  const box =
+function setupWholesale() {
+  const form =
     document.getElementById(
-      "zykaBotBox"
+      "wholesaleForm"
     );
 
-  box.style.display =
-    box.style.display === "block"
-      ? "none"
-      : "block";
-}
+  if (!form) {
+    return;
+  }
 
-function zykaAddMessage(text, type) {
-  const messages =
-    document.getElementById(
-      "zykaMessages"
-    );
+  form.addEventListener(
+    "submit",
+    function (event) {
+      event.preventDefault();
 
-  const message =
-    document.createElement(
-      "div"
-    );
+      const name =
+        document
+          .getElementById(
+            "wholesaleName"
+          )
+          ?.value.trim() || "";
 
-  message.className =
-    type === "user"
-      ? "zykaUserMsg"
-      : "zykaBotMsg";
+      const business =
+        document
+          .getElementById(
+            "wholesaleBusiness"
+          )
+          ?.value.trim() || "";
 
-  message.textContent =
-    text;
+      const phone =
+        document
+          .getElementById(
+            "wholesalePhone"
+          )
+          ?.value.trim() || "";
 
-  messages.appendChild(
-    message
+      const city =
+        document
+          .getElementById(
+            "wholesaleCity"
+          )
+          ?.value.trim() || "";
+
+      const product =
+        document
+          .getElementById(
+            "wholesaleProduct"
+          )
+          ?.value || "";
+
+      const qty =
+        document
+          .getElementById(
+            "wholesaleQty"
+          )
+          ?.value.trim() || "";
+
+      if (
+        !name ||
+        !phone ||
+        !city
+      ) {
+        alert(
+          "Please enter name, phone and city/district."
+        );
+        return;
+      }
+
+      const message =
+        `Hello ZYKA GOLD,
+
+WHOLESALE / DISTRIBUTOR ENQUIRY
+
+Name: ${name}
+Business: ${business || "Not specified"}
+Phone: ${phone}
+City / District: ${city}
+Product: ${product}
+Approx Quantity: ${qty || "Not specified"}
+
+Please share current wholesale price and business details.`;
+
+      window.open(
+        `https://wa.me/${ZYKA.whatsapp}?text=${encodeURIComponent(
+          message
+        )}`,
+        "_blank"
+      );
+    }
   );
-
-  messages.scrollTop =
-    messages.scrollHeight;
 }
 
-function zykaQuickAsk(text) {
-  document.getElementById(
-    "zykaInputText"
-  ).value = text;
+/* =========================
+   ASSISTANT
+========================= */
 
-  zykaSend();
-}
-
-function normalize(text) {
+function normalizeQuestion(text) {
   return text
     .toLowerCase()
-    .replace(
-      /[^\w\s₹]/g,
-      " "
-    )
-    .replace(
-      /\s+/g,
-      " "
-    )
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-function detectProduct(query) {
-  const aliases = [
-    [
-      "turmeric",
-      ["haldi", "turmeric"]
-    ],
-    [
-      "chilli",
-      [
-        "mirch",
-        "chilli",
-        "lal mirch"
-      ]
-    ],
-    [
-      "coriander",
-      [
-        "dhaniya",
-        "coriander"
-      ]
-    ],
-    [
-      "cumin",
-      [
-        "jeera",
-        "cumin"
-      ]
-    ]
-  ];
+function detectAssistantProduct(
+  question
+) {
+  const q =
+    normalizeQuestion(
+      question
+    );
 
   for (
-    const [id, terms]
-    of aliases
+    const id in ZYKA.products
   ) {
+    const product =
+      ZYKA.products[id];
+
     if (
-      terms.some(
-        (term) =>
-          query.includes(term)
+      product.aliases.some(
+        function (alias) {
+          return q.includes(
+            alias
+          );
+        }
       )
     ) {
-      return PRODUCTS.find(
-        (product) =>
-          product.id === id
-      );
+      return {
+        id: id,
+        product: product
+      };
     }
   }
 
   return null;
 }
 
-function smartLocalReply(rawText) {
-  const query =
-    normalize(rawText);
+function assistantReply(text) {
+  const q =
+    normalizeQuestion(text);
 
-  const product =
-    detectProduct(query);
+  const detected =
+    detectAssistantProduct(
+      text
+    );
 
   if (
-    /hello|hi|hey|namaste|salam/.test(
-      query
-    )
+    q.includes("hello") ||
+    q.includes("hi") ||
+    q.includes("hey") ||
+    q.includes("namaste") ||
+    q.includes("salam")
   ) {
     return (
-      "Namaste 👋 ZYKA GOLD me aapka swagat hai.\n\n" +
-      "Aap product, pack size, retail order, wholesale, payment ya support ke baare me pooch sakte hain."
+      "Namaste 👋\n\n" +
+      "ZYKA GOLD me aapka swagat hai.\n\n" +
+      "Main products, pack sizes, price enquiry, retail order, wholesale aur support me help kar sakta hoon."
     );
   }
 
   if (
-    /best seller|popular|sabse acha|sabse best/.test(
-      query
+    detected &&
+    (
+      q.includes("price") ||
+      q.includes("rate") ||
+      q.includes("mrp") ||
+      q.includes("kitna")
     )
   ) {
     return (
-      "🔥 Turmeric Powder aur Red Chilli Powder ko Best Seller highlight kiya gaya hai.\n\n" +
-      "Aap Shop section se pack size choose karke order kar sakte hain."
+      "💰 " +
+      detected.product.name +
+      " ka current price WhatsApp par confirm kiya jayega.\n\n" +
+      "Available pack sizes: 50g, 100g, 200g, 500g aur 1kg."
     );
   }
 
   if (
-    product &&
-    /price|rate|mrp|kitna|cost/.test(
-      query
-    )
-  ) {
-    const availablePrices =
-      Object.entries(
-        product.prices
-      ).filter(
-        ([, value]) =>
-          value > 0
-      );
-
-    if (
-      availablePrices.length
-    ) {
-      return (
-        `${product.name} prices:\n` +
-        availablePrices
-          .map(
-            ([size, price]) =>
-              `${size}: ₹${price}`
-          )
-          .join("\n")
-      );
-    }
-
-    return (
-      `💰 ${product.name} ka current price WhatsApp par confirm kijiye.\n\n` +
-      "Shop section se product aur pack size choose karke Buy Now karein. Price enquiry automatically WhatsApp par chali jayegi."
-    );
-  }
-
-  if (
-    product &&
-    /pack|size|gram|kg/.test(
-      query
+    detected &&
+    (
+      q.includes("pack") ||
+      q.includes("size") ||
+      q.includes("gram") ||
+      q.includes("kg")
     )
   ) {
     return (
-      `${product.name} ke available pack sizes:\n\n` +
+      detected.product.name +
+      " ke pack sizes:\n\n" +
       "• 50g\n" +
       "• 100g\n" +
       "• 200g\n" +
@@ -1125,214 +1356,204 @@ function smartLocalReply(rawText) {
     );
   }
 
-  if (product) {
+  if (detected) {
     return (
-      `${product.name}\n\n` +
-      `${product.desc}\n\n` +
-      "Pack sizes: 50g, 100g, 200g, 500g, 1kg.\n\n" +
-      "Current price ke liye WhatsApp par confirm kar sakte hain."
+      "🌶️ " +
+      detected.product.name +
+      "\n\n" +
+      "Available sizes: 50g, 100g, 200g, 500g aur 1kg.\n\n" +
+      "Current price ke liye Buy Now ya WhatsApp option use karein."
     );
   }
 
   if (
-    /product|masala|spice/.test(
-      query
-    )
+    q.includes("product") ||
+    q.includes("masala") ||
+    q.includes("spice")
   ) {
     return (
       "🌶️ ZYKA GOLD Products\n\n" +
-      "• Turmeric Powder\n" +
-      "• Red Chilli Powder\n" +
-      "• Coriander Powder\n" +
-      "• Cumin Powder\n\n" +
-      "Pack sizes: 50g, 100g, 200g, 500g, 1kg."
+      "• Turmeric Powder / Haldi\n" +
+      "• Red Chilli Powder / Lal Mirch\n" +
+      "• Coriander Powder / Dhaniya\n" +
+      "• Cumin Powder / Jeera\n\n" +
+      "Pack sizes: 50g, 100g, 200g, 500g aur 1kg."
     );
   }
 
   if (
-    /wholesale|bulk|dealer|distributor|dukan|shop|retailer/.test(
-      query
-    )
+    q.includes("price") ||
+    q.includes("rate") ||
+    q.includes("mrp") ||
+    q.includes("cost")
+  ) {
+    return (
+      "💰 Current product prices WhatsApp par confirm kiye jaate hain.\n\n" +
+      "Product aur pack size select karke Buy Now karein."
+    );
+  }
+
+  if (
+    q.includes("wholesale") ||
+    q.includes("bulk") ||
+    q.includes("dealer") ||
+    q.includes("distributor") ||
+    q.includes("retailer") ||
+    q.includes("shop") ||
+    q.includes("dukan")
   ) {
     return (
       "📦 Wholesale Enquiry\n\n" +
-      "Naam, shop/business name, phone, city/district, product aur approximate quantity fill kijiye.\n\n" +
-      "Current wholesale price WhatsApp par confirm ki jayegi."
+      "Wholesale ke liye website ke Retailer & Distributor Enquiry form me:\n\n" +
+      "• Name\n" +
+      "• Business name\n" +
+      "• Phone\n" +
+      "• City/District\n" +
+      "• Product\n" +
+      "• Approx quantity\n\n" +
+      "fill karke WhatsApp par quote mang sakte hain."
     );
   }
 
   if (
-    /cart|add to cart/.test(
-      query
-    )
+    q.includes("order") ||
+    q.includes("buy") ||
+    q.includes("kharid") ||
+    q.includes("checkout")
+  ) {
+    return (
+      "🛒 Order kaise karein:\n\n" +
+      "1. Product choose karein\n" +
+      "2. Pack size select karein\n" +
+      "3. Buy Now ya Add to Cart dabayein\n" +
+      "4. Continue Order karein\n" +
+      "5. Name, phone aur address fill karein\n" +
+      "6. WhatsApp par current price aur order confirm karein."
+    );
+  }
+
+  if (
+    q.includes("cart")
   ) {
     const count =
       cart.reduce(
-        (a, b) =>
-          a + b.qty,
+        function (
+          total,
+          item
+        ) {
+          return (
+            total +
+            Number(
+              item.qty || 0
+            )
+          );
+        },
         0
       );
 
     return (
-      `🛒 Aapke cart me ${count} item(s) hain.\n\n` +
-      "Pack choose karke Add to Cart karein, phir Checkout par jaakar WhatsApp se final price confirm kar sakte hain."
+      "🛒 Aapke cart me " +
+      count +
+      " item(s) hain."
     );
   }
 
   if (
-    /order|buy|kharid|purchase|checkout/.test(
-      query
-    )
+    q.includes("delivery") ||
+    q.includes("shipping")
   ) {
     return (
-      "🛒 Order Process\n\n" +
-      "1. Product choose karein\n" +
-      "2. Pack size select karein\n" +
-      "3. Add to Cart\n" +
-      "4. Checkout\n" +
-      "5. Name, phone aur address fill karein\n" +
-      "6. Price WhatsApp par confirm karein\n" +
-      "7. Price configured ho to UPI se pay karein."
+      "🚚 Delivery availability, charges aur expected timing order confirmation ke waqt WhatsApp par confirm ki jayegi."
     );
   }
 
   if (
-    /upi|payment|pay/.test(
-      query
-    )
+    q.includes("refund") ||
+    q.includes("cancel")
   ) {
     return (
-      "💳 Payment Help\n\n" +
-      "Agar product price website me configured hai to UPI option direct open hoga.\n\n" +
-      "Agar price configured nahi hai to wahi button WhatsApp par current price confirm karne ke liye le jayega."
+      "↩️ Cancellation / Refund policy footer me available hai. Final order-related help ke liye WhatsApp support use karein."
     );
   }
 
   if (
-    /delivery|shipping/.test(
-      query
-    )
-  ) {
-    return (
-      "🚚 Delivery aur shipping details order confirmation ke waqt WhatsApp par confirm ki jayengi."
-    );
-  }
-
-  if (
-    /refund|cancel/.test(
-      query
-    )
-  ) {
-    return (
-      "↩️ Cancellation / Refund details footer ke Cancellation / Refund page par available hain."
-    );
-  }
-
-  if (
-    /contact|support|help|whatsapp|phone|number/.test(
-      query
-    )
+    q.includes("support") ||
+    q.includes("contact") ||
+    q.includes("whatsapp") ||
+    q.includes("phone") ||
+    q.includes("number")
   ) {
     return (
       "💬 ZYKA GOLD Support\n\n" +
-      "Phone / WhatsApp:\n" +
+      "WhatsApp / Phone:\n" +
       "+91 81029 42195\n\n" +
       "Email:\n" +
-      "care.zykagold@gmail.com"
+      ZYKA.email
     );
   }
 
   return (
-    "🤖 Main ZYKA Assistant Pro hoon.\n\n" +
-    "Aap aise questions pooch sakte hain:\n\n" +
-    "• Haldi 100g price\n" +
-    "• Mirch ke pack sizes\n" +
-    "• Wholesale price kaise milega?\n" +
+    "🤖 Main ZYKA GOLD Smart Assistant hoon.\n\n" +
+    "Aap mujhse pooch sakte hain:\n\n" +
+    "• Haldi ke pack sizes\n" +
+    "• Mirch ka price\n" +
+    "• Wholesale kaise milega?\n" +
     "• Order kaise karu?\n" +
-    "• Payment kaise hoga?\n" +
+    "• Delivery kaise hogi?\n" +
     "• Support number kya hai?"
   );
 }
 
-async function zykaSend() {
-  const input =
+function addAssistantMessage(
+  text,
+  type
+) {
+  const messages =
     document.getElementById(
-      "zykaInputText"
+      "assistantMessages"
     );
 
-  const text =
-    input.value.trim();
-
-  if (!text) {
+  if (!messages) {
     return;
   }
 
-  zykaAddMessage(
-    text,
+  const div =
+    document.createElement(
+      "div"
+    );
+
+  div.className =
+    type === "user"
+      ? "user-message"
+      : "bot-message";
+
+  div.textContent = text;
+
+  messages.appendChild(div);
+
+  messages.scrollTop =
+    messages.scrollHeight;
+}
+
+function sendAssistantQuestion(
+  text
+) {
+  const clean =
+    text.trim();
+
+  if (!clean) {
+    return;
+  }
+
+  addAssistantMessage(
+    clean,
     "user"
   );
 
-  input.value = "";
-
-  if (CONFIG.aiEndpoint) {
-    try {
-      const response =
-        await fetch(
-          CONFIG.aiEndpoint,
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body:
-              JSON.stringify({
-                message: text,
-                cart,
-                products:
-                  PRODUCTS.map(
-                    ({
-                      id,
-                      name,
-                      desc,
-                      prices
-                    }) => ({
-                      id,
-                      name,
-                      desc,
-                      prices
-                    })
-                  )
-              })
-          }
-        );
-
-      if (response.ok) {
-        const data =
-          await response.json();
-
-        if (data.reply) {
-          zykaAddMessage(
-            data.reply,
-            "bot"
-          );
-
-          return;
-        }
-      }
-    } catch (error) {
-      console.log(
-        "AI backend unavailable. Using local assistant."
-      );
-    }
-  }
-
-  setTimeout(
-    () => {
-      zykaAddMessage(
-        smartLocalReply(text),
+  window.setTimeout(
+    function () {
+      addAssistantMessage(
+        assistantReply(clean),
         "bot"
       );
     },
@@ -1340,17 +1561,110 @@ async function zykaSend() {
   );
 }
 
-window.addEventListener(
-  "click",
-  (event) => {
-    if (
-      event.target.id ===
-      "checkoutModal"
-    ) {
-      closeCheckout();
-    }
-  }
-);
+function setupAssistant() {
+  const button =
+    document.getElementById(
+      "assistantButton"
+    );
 
-renderProducts();
-updateCounts();
+  const box =
+    document.getElementById(
+      "assistantBox"
+    );
+
+  const close =
+    document.getElementById(
+      "assistantClose"
+    );
+
+  const form =
+    document.getElementById(
+      "assistantForm"
+    );
+
+  const input =
+    document.getElementById(
+      "assistantInput"
+    );
+
+  if (button && box) {
+    button.addEventListener(
+      "click",
+      function () {
+        box.classList.toggle(
+          "show"
+        );
+      }
+    );
+  }
+
+  if (close && box) {
+    close.addEventListener(
+      "click",
+      function () {
+        box.classList.remove(
+          "show"
+        );
+      }
+    );
+  }
+
+  if (form && input) {
+    form.addEventListener(
+      "submit",
+      function (event) {
+        event.preventDefault();
+
+        sendAssistantQuestion(
+          input.value
+        );
+
+        input.value = "";
+      }
+    );
+  }
+
+  document
+    .querySelectorAll(
+      "[data-question]"
+    )
+    .forEach(
+      function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            sendAssistantQuestion(
+              button.dataset.question
+            );
+          }
+        );
+      }
+    );
+}
+
+/* =========================
+   START
+========================= */
+
+function startZykaGold() {
+  loadSavedData();
+
+  setupMenu();
+  setupSearch();
+  setupProductButtons();
+  setupDrawers();
+  setupCheckout();
+  setupWholesale();
+  setupAssistant();
+
+  updateCounts();
+  updateWishlistButtons();
+  renderCart();
+  renderWishlist();
+  filterProducts();
+}
+
+document.addEventListener(
+  "DOMContentLoaded",
+  startZykaGold
+);
